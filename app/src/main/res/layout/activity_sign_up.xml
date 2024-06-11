@@ -1,0 +1,48 @@
+<!-- res/layout/activity_sign_up.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/fullNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Full Name"
+        android:inputType="textPersonName"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/emailEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email/Username"
+        android:inputType="textEmailAddress"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/verifyPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Verify Password"
+        android:inputType="textPassword"
+        android:padding="10dp" />
+
+    <Button
+        android:id="@+id/signUpButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:layout_marginTop="16dp"
+        android:padding="10dp" />
+
+</LinearLayout>

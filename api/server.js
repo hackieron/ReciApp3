@@ -60,13 +60,31 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
 });
 
 // GET endpoint for fetching all recipes
+// GET endpoint for fetching all recipes with user information
 app.get('/api/recipes', verifyToken, async (req, res) => {
   try {
     const recipesSnapshot = await db.collection('recipes').get();
-    const recipes = recipesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const recipes = [];
+
+    // Iterate over each recipe document
+    for (const doc of recipesSnapshot.docs) {
+      const recipeData = doc.data();
+
+      // Retrieve user information from 'users' collection based on 'userId'
+      const userSnapshot = await db.collection('users').doc(recipeData.userId).get();
+      const userData = userSnapshot.data();
+
+      // Combine recipe data with user data
+      const recipeWithUser = {
+        recipeId: doc.id,
+        recipeName: recipeData.recipeName,
+        ingredients: recipeData.ingredients,
+        steps: recipeData.steps,
+        userName: userData.username, // Assuming 'username' field exists in the 'users' collection
+      };
+
+      recipes.push(recipeWithUser);
+    }
 
     res.status(200).json(recipes);
   } catch (error) {
@@ -74,6 +92,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
 
 // Start the server
 app.listen(PORT, () => {

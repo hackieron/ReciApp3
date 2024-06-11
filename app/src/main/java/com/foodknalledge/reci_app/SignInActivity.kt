@@ -29,6 +29,11 @@ class SignInActivity : AppCompatActivity() {
         }
 
         auth = FirebaseAuth.getInstance()
+        val signUpButton = findViewById<Button>(R.id.signUpButton)
+        signUpButton.setOnClickListener {
+            // Start the SignUpActivity
+            startActivity(Intent(this, SignUpActivity::class.java))
+        }
 
         // Check if user is already signed in
         val currentUser = auth.currentUser

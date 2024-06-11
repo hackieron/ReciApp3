@@ -52,7 +52,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.activity)
     implementation(libs.firebase.auth.ktx)
-    implementation (libs.firebase.auth) // Or the latest version
+    implementation (libs.firebase.auth)
+    implementation(libs.firebase.firestore.ktx) // Or the latest version
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
