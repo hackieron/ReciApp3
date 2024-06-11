@@ -60,6 +60,7 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
   }
 });
 // POST endpoint for updating counts for a recipe
+
 app.post('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
   try {
     const { likesCount, commentsCount, sharesCount } = req.body;
@@ -78,6 +79,8 @@ app.post('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
+
 
 // GET endpoint for fetching all recipes
 // GET endpoint for fetching all recipes with user information
@@ -205,6 +208,28 @@ app.put('/api/recipes/:recipeId/sharesCount', verifyToken, async (req, res) => {
     res.status(200).json({ message: 'Shares count updated successfully' });
   } catch (error) {
     console.error('Error updating shares count:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
+// GET endpoint to fetch counts for a recipe
+app.get('/api/recipes/:recipeId/count', async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+
+    // Retrieve counts from the "count" collection
+    const countDoc = await db.collection('count').doc(recipeId).get();
+    const countData = countDoc.data();
+
+    // Check if counts exist for the recipe
+    if (!countData) {
+      return res.status(404).json({ error: 'Counts not found for the recipe' });
+    }
+
+    // Respond with counts
+    res.status(200).json(countData);
+  } catch (error) {
+    console.error('Error fetching counts:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });

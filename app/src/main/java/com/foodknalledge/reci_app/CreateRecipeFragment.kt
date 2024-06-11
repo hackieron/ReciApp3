@@ -122,9 +122,8 @@ class CreateRecipeFragment : Fragment() {
                         requireActivity().runOnUiThread {
                             Toast.makeText(requireContext(), "Recipe created successfully", Toast.LENGTH_SHORT).show()
                         }
-
-                        // Send a POST request to update counts
-                        sendCountsUpdateRequest(response.body?.string() ?: "", token)
+                        // Send a POST request to update counts for the recipe
+                        updateRecipeCounts(recipeName)
                     } else {
                         Log.e(TAG, "Failed to create recipe: ${response.code}")
                         requireActivity().runOnUiThread {
@@ -136,33 +135,34 @@ class CreateRecipeFragment : Fragment() {
         }
     }
 
-    // Function to send a POST request to update counts
-    private fun sendCountsUpdateRequest(recipeId: String, token: String) {
+    // Function to send a POST request to update counts for the recipe
+    private fun updateRecipeCounts(recipeName: String) {
+        val url = "https://reci-app-testing.vercel.app/api/recipes/$recipeName/count"
         val client = OkHttpClient()
-        val countUrl = "https://reci-app-testing.vercel.app/api/recipes/$recipeId/count"
+
         val json = JSONObject().apply {
-            put("likesCount", 0) // Assuming initial likes count is 0
-            put("commentsCount", 0) // Assuming initial comments count is 0
-            put("sharesCount", 0) // Assuming initial shares count is 0
+            // You can include any counts you want to update here
+            put("likesCount", 0)
+            put("commentsCount", 0)
+            put("sharesCount", 0)
         }
 
         val body = RequestBody.create("application/json".toMediaTypeOrNull(), json.toString())
         val request = Request.Builder()
-            .url(countUrl)
-            .header("Authorization", token)
+            .url(url)
             .post(body)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Failed to update counts for recipe $recipeId", e)
+                Log.e(TAG, "Failed to update counts for the recipe", e)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    Log.i(TAG, "Counts updated successfully for recipe $recipeId")
+                    Log.i(TAG, "Counts updated successfully")
                 } else {
-                    Log.e(TAG, "Failed to update counts for recipe $recipeId: ${response.code}")
+                    Log.e(TAG, "Failed to update counts for the recipe: ${response.code}")
                 }
             }
         })
