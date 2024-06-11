@@ -40,7 +40,7 @@ const verifyToken = async (req, res, next) => {
 // POST endpoint for creating a new recipe
 app.post('/api/recipes', verifyToken, async (req, res) => {
   try {
-    const { recipeName, ingredients, steps } = req.body;
+    const { recipeName, ingredients, steps, fullName } = req.body;
     const userId = req.uid;
 
     // Create new recipe document
@@ -48,7 +48,8 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
       userId, // Add userId to the recipe document
       recipeName,
       ingredients,
-      steps
+      steps,
+      fullName
     });
 
     // Respond with success message and ID of the newly created recipe
@@ -97,7 +98,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
         recipeName: recipeData.recipeName,
         ingredients: recipeData.ingredients,
         steps: recipeData.steps,
-        userName: userData.fullName, // Assuming 'username' field exists in the 'users' collection
+        fullName: userData.fullName, // Assuming 'username' field exists in the 'users' collection
       };
 
       recipes.push(recipeWithUser);
