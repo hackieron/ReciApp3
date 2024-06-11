@@ -69,8 +69,8 @@ class RecipeListFragment : Fragment() {
                             val recipes = JSONArray(responseData)
                             val recipeList = mutableListOf<Recipe>()
                             for (i in 0 until recipes.length()) {
-                                var name = recipes.getJSONObject(i).getString("fullName")
                                 val recipe = recipes.getJSONObject(i)
+                                val name = recipe.getString("fullName")
                                 val recipeName = recipe.getString("recipeName")
                                 val ingredients = jsonArrayToList(recipe.getJSONArray("ingredients"))
                                 val steps = jsonArrayToList(recipe.getJSONArray("steps"))
@@ -108,6 +108,7 @@ class RecipeListFragment : Fragment() {
         RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
 
         class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val fullNameTextView: TextView = itemView.findViewById(R.id.fullNameTextView)
             val recipeNameTextView: TextView = itemView.findViewById(R.id.recipeNameTextView)
             val ingredientsTextView: TextView = itemView.findViewById(R.id.ingredientsTextView)
             val stepsTextView: TextView = itemView.findViewById(R.id.stepsTextView)
@@ -121,6 +122,7 @@ class RecipeListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
             val recipe = recipeList[position]
+            holder.fullNameTextView.text = recipe.fullName
             holder.recipeNameTextView.text = recipe.name
             holder.ingredientsTextView.text = recipe.ingredients.joinToString(", ")
             holder.stepsTextView.text = recipe.steps.joinToString(", ")

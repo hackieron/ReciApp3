@@ -59,6 +59,25 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+// POST endpoint for updating counts for a recipe
+app.post('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
+  try {
+    const { likesCount, commentsCount, sharesCount } = req.body;
+    const { recipeId } = req.params;
+
+    // Update counts in the "count" collection
+    await db.collection('count').doc(recipeId).set({
+      likesCount,
+      commentsCount,
+      sharesCount
+    }, { merge: true }); // Merge with existing document if it exists
+
+    res.status(200).json({ message: 'Counts updated successfully' });
+  } catch (error) {
+    console.error('Error updating counts:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
 
 // GET endpoint for fetching all recipes
 // GET endpoint for fetching all recipes with user information
@@ -86,8 +105,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
 
     // Fetch user data for all recipes in a single batch
     const userIds = recipesSnapshot.docs.map(doc => doc.data().userId);
-    const usersSnapshot = await db.collection('users').where(admin.firestore.FieldPath.documentId(), 'in', userIds).get();
-    const usersMap = new Map(usersSnapshot.docs.map(doc => [doc.id, doc.data()]));
+
 
     // Iterate over each recipe document
     for (const doc of recipesSnapshot.docs) {
@@ -95,7 +113,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
       const userId = recipeData.userId;
 
       // Retrieve user data from the map
-      const userData = usersMap.get(userId);
+
 
       // Combine recipe data with user data
       const recipeWithUser = {
@@ -112,6 +130,81 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
     res.status(200).json(recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+// GET endpoint to fetch counts for a recipe
+app.get('/api/recipes/:recipeId/count', async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+
+    // Retrieve counts from the "count" collection
+    const countDoc = await db.collection('count').doc(recipeId).get();
+    const countData = countDoc.data();
+
+    // Check if counts exist for the recipe
+    if (!countData) {
+      return res.status(404).json({ error: 'Counts not found for the recipe' });
+    }
+
+    // Respond with counts
+    res.status(200).json(countData);
+  } catch (error) {
+    console.error('Error fetching counts:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
+// PUT endpoint for updating likes count for a recipe
+app.put('/api/recipes/:recipeId/likesCount', verifyToken, async (req, res) => {
+  try {
+    const { likesCount } = req.body;
+    const { recipeId } = req.params;
+
+    // Update likesCount in the "count" collection
+    await db.collection('count').doc(recipeId).set({
+      likesCount
+    }, { merge: true }); // Merge with existing document if it exists
+
+    res.status(200).json({ message: 'Likes count updated successfully' });
+  } catch (error) {
+    console.error('Error updating likes count:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
+// PUT endpoint for updating comments count for a recipe
+app.put('/api/recipes/:recipeId/commentsCount', verifyToken, async (req, res) => {
+  try {
+    const { commentsCount } = req.body;
+    const { recipeId } = req.params;
+
+    // Update commentsCount in the "count" collection
+    await db.collection('count').doc(recipeId).set({
+      commentsCount
+    }, { merge: true }); // Merge with existing document if it exists
+
+    res.status(200).json({ message: 'Comments count updated successfully' });
+  } catch (error) {
+    console.error('Error updating comments count:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
+// PUT endpoint for updating shares count for a recipe
+app.put('/api/recipes/:recipeId/sharesCount', verifyToken, async (req, res) => {
+  try {
+    const { sharesCount } = req.body;
+    const { recipeId } = req.params;
+
+    // Update sharesCount in the "count" collection
+    await db.collection('count').doc(recipeId).set({
+      sharesCount
+    }, { merge: true }); // Merge with existing document if it exists
+
+    res.status(200).json({ message: 'Shares count updated successfully' });
+  } catch (error) {
+    console.error('Error updating shares count:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
