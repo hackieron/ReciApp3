@@ -111,6 +111,61 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
   }
 });
 
+// PUT endpoint for updating counts inside count
+app.put('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
+  try {
+    const recipeId = req.params.recipeId;
+    const { likeCount, commentCount, shareCount } = req.body;
+
+    const recipeRef = db.collection('recipes').doc(recipeId);
+    const recipeSnapshot = await recipeRef.get();
+
+    if (!recipeSnapshot.exists) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+
+    // Update the count field
+    await recipeRef.update({
+      'count': [{
+        likeCount,
+        commentCount,
+        shareCount
+      }]
+    });
+
+    res.status(200).json({ message: 'Counts updated successfully' });
+  } catch (error) {
+    console.error('Error updating counts:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+app.put('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
+  try {
+    const recipeId = req.params.recipeId;
+    const { likeCount, commentCount, shareCount } = req.body;
+
+    const recipeRef = db.collection('recipes').doc(recipeId);
+    const recipeSnapshot = await recipeRef.get();
+
+    if (!recipeSnapshot.exists) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+
+    // Update the count field
+    await recipeRef.update({
+      'count': [{
+        likeCount,
+        commentCount,
+        shareCount
+      }]
+    });
+
+    res.status(200).json({ message: 'Counts updated successfully' });
+  } catch (error) {
+    console.error('Error updating counts:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
