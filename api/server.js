@@ -103,7 +103,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
         recipeName: recipeData.recipeName,
         ingredients: recipeData.ingredients,
         steps: recipeData.steps,
-        fullName: userData ? userData.fullName : '', // Check if userData exists
+        fullName: recipeData.fullName, // Check if userData exists
       };
 
       recipes.push(recipeWithUser);
