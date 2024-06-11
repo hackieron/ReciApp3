@@ -46,7 +46,7 @@ class RecipeListFragment : Fragment() {
     private fun fetchRecipes(token: String) {
         val url = "https://reci-app-testing.vercel.app/api/recipes"
         val client = OkHttpClient()
-
+        Log.i(TAG, "TOKEN: $token")
         val request = Request.Builder()
             .url(url)
             .header("Authorization", token)

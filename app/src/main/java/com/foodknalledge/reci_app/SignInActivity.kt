@@ -84,6 +84,7 @@ class SignInActivity : AppCompatActivity() {
 
     private fun saveUserToken(token: String) {
         // Save the token locally
+        Log.d(TAG, "kierToken: $token")
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("user_token", token)
