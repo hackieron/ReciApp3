@@ -1,42 +1,55 @@
 package com.foodknalledge.reci_app.ui.notifications
 
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.foodknalledge.reci_app.databinding.FragmentNotificationsBinding
+import com.foodknalledge.reci_app.R
+import com.foodknalledge.reci_app.SignInActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class NotificationsFragment : Fragment() {
 
-    private var _binding: FragmentNotificationsBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(NotificationsViewModel::class.java)
+    ): View? {
+        val rootView = inflater.inflate(R.layout.fragment_notifications, container, false)
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        sharedPreferences = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
-        val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        val logoutButton = rootView.findViewById<Button>(R.id.logoutButton)
+
+        logoutButton.setOnClickListener {
+            logoutUser()
         }
-        return root
+
+        return rootView
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun logoutUser() {
+        // Log out from Firebase
+        FirebaseAuth.getInstance().signOut()
+
+        // Remove token from SharedPreferences
+        val editor = sharedPreferences.edit()
+        editor.remove("user_token")
+        editor.apply()
+
+        // Show a toast message
+        Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+
+        // Redirect to SignInActivity
+        val intent = Intent(requireContext(), SignInActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }
