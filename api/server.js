@@ -78,19 +78,24 @@ app.get('/api/user/:userId/fullname', verifyToken, async (req, res) => {
   }
 });
 
-// GET endpoint for fetching all recipes
+// GET endpoint for fetching all recipes with user information
 app.get('/api/recipes', verifyToken, async (req, res) => {
   try {
     const recipesSnapshot = await db.collection('recipes').get();
     const recipes = [];
 
+    // Fetch user data for all recipes in a single batch
+    const userIds = recipesSnapshot.docs.map(doc => doc.data().userId);
+    const usersSnapshot = await db.collection('users').where(admin.firestore.FieldPath.documentId(), 'in', userIds).get();
+    const usersMap = new Map(usersSnapshot.docs.map(doc => [doc.id, doc.data()]));
+
     // Iterate over each recipe document
     for (const doc of recipesSnapshot.docs) {
       const recipeData = doc.data();
+      const userId = recipeData.userId;
 
-      // Retrieve user information from 'users' collection based on 'userId'
-      const userSnapshot = await db.collection('users').doc(recipeData.userId).get();
-      const userData = userSnapshot.data();
+      // Retrieve user data from the map
+      const userData = usersMap.get(userId);
 
       // Combine recipe data with user data
       const recipeWithUser = {
@@ -98,7 +103,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
         recipeName: recipeData.recipeName,
         ingredients: recipeData.ingredients,
         steps: recipeData.steps,
-        fullName: userData.fullName, // Assuming 'username' field exists in the 'users' collection
+        fullName: userData ? userData.fullName : '', // Check if userData exists
       };
 
       recipes.push(recipeWithUser);
@@ -110,6 +115,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
 
 // Start the server
 app.listen(PORT, () => {

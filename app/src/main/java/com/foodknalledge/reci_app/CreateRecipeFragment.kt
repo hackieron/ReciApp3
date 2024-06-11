@@ -135,11 +135,12 @@ class CreateRecipeFragment : Fragment() {
 
     // Function to fetch user's full name from the server
     private fun fetchUserFullName(userId: String, callback: (String) -> Unit) {
-        val url = "https://reci-app-testing.vercel.app/api/user/${userId}/fullname" // Modify endpoint to fetch full name
+        val url = "https://reci-app-testing.vercel.app/api/user/${userId}/fullname"
         val client = OkHttpClient()
-
+        val token = sharedPreferences.getString("user_token", null)
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", token.toString()) // Add the authorization header here
             .get()
             .build()
 
@@ -154,6 +155,7 @@ class CreateRecipeFragment : Fragment() {
             }
         })
     }
+
 
 
 }

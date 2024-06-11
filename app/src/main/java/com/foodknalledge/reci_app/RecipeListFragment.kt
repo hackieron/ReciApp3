@@ -46,7 +46,7 @@ class RecipeListFragment : Fragment() {
     private fun fetchRecipes(token: String) {
         val url = "https://reci-app-testing.vercel.app/api/recipes"
         val client = OkHttpClient()
-        Log.i(TAG, "TOKEN: $token")
+        Log.i(TAG, "user kier TOKEN: $token")
         val request = Request.Builder()
             .url(url)
             .header("Authorization", token)
@@ -86,6 +86,7 @@ class RecipeListFragment : Fragment() {
                 } else {
                     Log.e(TAG, "Failed to fetch recipes: ${response.code}")
                     requireActivity().runOnUiThread {
+
                         Toast.makeText(requireContext(), "Failed to fetch recipes", Toast.LENGTH_SHORT).show()
                     }
                 }
