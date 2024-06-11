@@ -31,23 +31,46 @@
         android:layout_height="wrap_content"
         android:text="Steps" />
 
-    <!-- Checkboxes for like, comment, and share -->
-    <CheckBox
-        android:id="@+id/likeCheckBox"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp">
+
+        <Button
+            android:id="@+id/likeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Like" />
+
+        <Button
+            android:id="@+id/commentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comment" />
+
+        <Button
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/likeCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Like" />
+        android:text="Likes: " />
 
-    <CheckBox
-        android:id="@+id/commentCheckBox"
+    <TextView
+        android:id="@+id/commentCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Comment" />
+        android:text="Comments: " />
 
-    <CheckBox
-        android:id="@+id/shareCheckBox"
+    <TextView
+        android:id="@+id/shareCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Share" />
-
+        android:text="Shares: " />
 </LinearLayout>

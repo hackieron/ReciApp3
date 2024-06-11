@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -73,15 +75,15 @@ class RecipeListFragment : Fragment() {
                             val recipeList = mutableListOf<Recipe>()
                             for (i in 0 until recipes.length()) {
                                 val recipe = recipes.getJSONObject(i)
-                                val recipeId = recipe.getString("recipeId")
-                                val name = recipe.getString("fullName")
                                 val recipeName = recipe.getString("recipeName")
                                 val ingredients = jsonArrayToList(recipe.getJSONArray("ingredients"))
                                 val steps = jsonArrayToList(recipe.getJSONArray("steps"))
+                                val fullName = recipe.getString("fullName")
+                                val recipeId = recipe.getString("recipeId")
 
-                                recipeList.add(Recipe(recipeId, recipeName, ingredients, steps, name))
+                                recipeList.add(Recipe(recipeId, recipeName, ingredients, steps, fullName))
                             }
-                            recipeRecyclerView.adapter = RecipeAdapter(recipeList, sharedPreferences) // Pass sharedPreferences here
+                            recipeRecyclerView.adapter = RecipeAdapter(recipeList, token)
                         } catch (e: Exception) {
                             Log.e(TAG, "Failed to parse recipes", e)
                             Toast.makeText(requireContext(), "Failed to parse recipes", Toast.LENGTH_SHORT).show()
@@ -106,21 +108,28 @@ class RecipeListFragment : Fragment() {
         }
         return list
     }
-    data class Recipe(val recipeId: String, val name: String, val ingredients: List<String>, val steps: List<String>, val fullName: String)
+    data class Recipe(
+        val id: String,
+        val name: String,
+        val ingredients: List<String>,
+        val steps: List<String>,
+        val fullName: String
+    )
 
-
-    class RecipeAdapter(private val recipeList: List<Recipe>,
-                        private val sharedPreferences: SharedPreferences) :
-        RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
+    class RecipeAdapter(
+        private val recipeList: List<Recipe>,
+        private val token: String
+    ) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
 
         class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val fullNameTextView: TextView = itemView.findViewById(R.id.fullNameTextView)
             val recipeNameTextView: TextView = itemView.findViewById(R.id.recipeNameTextView)
+            val fullNameTextView: TextView = itemView.findViewById(R.id.fullNameTextView)
             val ingredientsTextView: TextView = itemView.findViewById(R.id.ingredientsTextView)
             val stepsTextView: TextView = itemView.findViewById(R.id.stepsTextView)
-            val likeCheckBox: CheckBox = itemView.findViewById(R.id.likeCheckBox)
-            val commentCheckBox: CheckBox = itemView.findViewById(R.id.commentCheckBox)
-            val shareCheckBox: CheckBox = itemView.findViewById(R.id.shareCheckBox)
+            val likeButton: Button = itemView.findViewById(R.id.likeButton)
+            val shareButton: Button = itemView.findViewById(R.id.shareButton)
+            val commentButton: Button = itemView.findViewById(R.id.commentButton)
+
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -131,63 +140,78 @@ class RecipeListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
             val recipe = recipeList[position]
-
-            holder.fullNameTextView.text = recipe.fullName
             holder.recipeNameTextView.text = recipe.name
+            holder.fullNameTextView.text = recipe.fullName
             holder.ingredientsTextView.text = recipe.ingredients.joinToString(", ")
             holder.stepsTextView.text = recipe.steps.joinToString(", ")
 
-            // Handle checkbox clicks
-            holder.likeCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendCountUpdateRequest(recipe, "likesCount")
-                }
+            holder.likeButton.setOnClickListener {
+                updateCount(recipe, "likeCount", 1, token) // Increment like count by 1
+            }
+            holder.commentButton.setOnClickListener {
+                updateCount(recipe, "commentCount", 1, token) // Increment like count by 1
+            }
+            holder.shareButton.setOnClickListener {
+                updateCount(recipe, "shareCount", 1, token) // Increment like count by 1
             }
 
-            holder.commentCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendCountUpdateRequest(recipe, "commentsCount")
-                }
-            }
 
-            holder.shareCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendCountUpdateRequest(recipe, "sharesCount")
-                }
-            }
+
         }
 
-        private fun sendCountUpdateRequest(recipe: Recipe, countType: String) {
-            val url = "https://reci-app-testing.vercel.app/api/recipes/${recipe.recipeId}/count"
-            val client = OkHttpClient()
-            val token = sharedPreferences.getString("user_token", null)
-            val countData = JSONObject().apply { put(countType, 1) } // Increase count by 1
+        override fun getItemCount(): Int {
+            return recipeList.size
+        }
 
-            val body = RequestBody.create("application/json".toMediaTypeOrNull(), countData.toString())
+        private fun updateCount(recipe: Recipe, countType: String, increment: Int, token: String) {
+            val url = "https://reci-app-testing.vercel.app/api/recipes/${recipe.id}/$countType"
+            val client = OkHttpClient()
+
+            // Create a JSON object for the request body
+            val requestBody = JSONObject().apply {
+                put(countType, 1) // Increment count by the provided value
+            }
+
             val request = Request.Builder()
                 .url(url)
-                .header("Authorization", token.toString())
-                .put(body)
+                .header("Authorization", token)
+                .put(
+                    requestBody.toString()
+                        .toRequestBody("application/json".toMediaTypeOrNull())
+                )
                 .build()
+
+
+            // Log the URL and request body
+            Log.i(TAG, "PUT URL: $url")
+            Log.i(TAG, "Request Body for $countType count: $requestBody")
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.e(TAG, "Failed to update $countType count for recipe ${recipe.recipeId}", e)
+                    Log.e(TAG, "Failed to update $countType", e)
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        Log.i(TAG, "Successfully updated $countType count for recipe ${recipe.recipeId}")
-                    } else {
-                        Log.e(TAG, "Failed to update $countType count for recipe ${recipe.recipeId}: ${response.code}")
+                    if (!response.isSuccessful) {
+                        Log.e(TAG, "Failed to update $countType: ${response.code}")
+                        return
+                    }
+
+                    // Update was successful, log the updated count
+                    try {
+                        val responseData = response.body?.string()
+                        val updatedCount = JSONObject(responseData).getInt(countType)
+                        Log.i(TAG, "COUNT OF $countType for ${recipe.id} | after $countType: $updatedCount")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to parse $countType count after update", e)
                     }
                 }
             })
         }
 
 
-        override fun getItemCount(): Int {
-            return recipeList.size
-        }
+
+
     }
+
 }
