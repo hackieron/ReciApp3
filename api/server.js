@@ -124,9 +124,9 @@ app.put('/api/recipes/:recipeId/likeCount', verifyToken, async (req, res) => {
       return res.status(404).json({ error: 'Recipe not found' });
     }
 
-    // Update the likeCount field
+    // Increment the likeCount field
     await recipeRef.update({
-      'count.likeCount': likeCount
+      'count.likeCount': admin.firestore.FieldValue.increment(likeCount)
     });
 
     res.status(200).json({ message: 'Like count updated successfully' });
@@ -149,9 +149,9 @@ app.put('/api/recipes/:recipeId/commentCount', verifyToken, async (req, res) => 
       return res.status(404).json({ error: 'Recipe not found' });
     }
 
-    // Update the commentCount field
+    // Increment the commentCount field
     await recipeRef.update({
-      'count.commentCount': commentCount
+      'count.commentCount': admin.firestore.FieldValue.increment(commentCount)
     });
 
     res.status(200).json({ message: 'Comment count updated successfully' });
@@ -174,9 +174,9 @@ app.put('/api/recipes/:recipeId/shareCount', verifyToken, async (req, res) => {
       return res.status(404).json({ error: 'Recipe not found' });
     }
 
-    // Update the shareCount field
+    // Increment the shareCount field
     await recipeRef.update({
-      'count.shareCount': shareCount
+      'count.shareCount': admin.firestore.FieldValue.increment(shareCount)
     });
 
     res.status(200).json({ message: 'Share count updated successfully' });
@@ -185,6 +185,7 @@ app.put('/api/recipes/:recipeId/shareCount', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
 
 // Start the server
 app.listen(PORT, () => {
