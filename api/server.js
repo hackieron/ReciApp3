@@ -38,9 +38,10 @@ const verifyToken = async (req, res, next) => {
 };
 
 // POST endpoint for creating a new recipe
+// POST endpoint for creating a new recipe
 app.post('/api/recipes', verifyToken, async (req, res) => {
   try {
-    const { recipeName, ingredients, steps, fullName, count } = req.body;
+    const { recipeName, ingredients, steps, fullName } = req.body;
     const userId = req.uid;
 
     // Create new recipe document
@@ -50,16 +51,32 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
       ingredients,
       steps,
       fullName,
-      count
+      count: { // Set initial count values to 0
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0
+      }
     });
 
     // Respond with success message and ID of the newly created recipe
-    res.status(201).json({ message: 'Recipe created successfully', recipeId: recipeRef.id });
+    res.status(201).json({
+      recipeId: recipeRef.id,
+      recipeName,
+      ingredients,
+      steps,
+      fullName,
+      count: { // Return the count object with initial values
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0
+      }
+    });
   } catch (error) {
     console.error('Error creating recipe:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
 
 // GET endpoint for fetching user's full name
 app.get('/api/user/:userId/fullname', verifyToken, async (req, res) => {
