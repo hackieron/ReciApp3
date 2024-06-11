@@ -111,11 +111,11 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
   }
 });
 
-// PUT endpoint for updating counts inside count
-app.put('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
+// PUT endpoint for updating like count
+app.put('/api/recipes/:recipeId/likeCount', verifyToken, async (req, res) => {
   try {
     const recipeId = req.params.recipeId;
-    const { likeCount, commentCount, shareCount } = req.body;
+    const { likeCount } = req.body;
 
     const recipeRef = db.collection('recipes').doc(recipeId);
     const recipeSnapshot = await recipeRef.get();
@@ -124,25 +124,23 @@ app.put('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
       return res.status(404).json({ error: 'Recipe not found' });
     }
 
-    // Update the count field
+    // Update the likeCount field
     await recipeRef.update({
-      'count': [{
-        likeCount,
-        commentCount,
-        shareCount
-      }]
+      'count.likeCount': likeCount
     });
 
-    res.status(200).json({ message: 'Counts updated successfully' });
+    res.status(200).json({ message: 'Like count updated successfully' });
   } catch (error) {
-    console.error('Error updating counts:', error);
+    console.error('Error updating like count:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
-app.put('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
+
+// PUT endpoint for updating comment count
+app.put('/api/recipes/:recipeId/commentCount', verifyToken, async (req, res) => {
   try {
     const recipeId = req.params.recipeId;
-    const { likeCount, commentCount, shareCount } = req.body;
+    const { commentCount } = req.body;
 
     const recipeRef = db.collection('recipes').doc(recipeId);
     const recipeSnapshot = await recipeRef.get();
@@ -151,21 +149,43 @@ app.put('/api/recipes/:recipeId/count', verifyToken, async (req, res) => {
       return res.status(404).json({ error: 'Recipe not found' });
     }
 
-    // Update the count field
+    // Update the commentCount field
     await recipeRef.update({
-      'count': [{
-        likeCount,
-        commentCount,
-        shareCount
-      }]
+      'count.commentCount': commentCount
     });
 
-    res.status(200).json({ message: 'Counts updated successfully' });
+    res.status(200).json({ message: 'Comment count updated successfully' });
   } catch (error) {
-    console.error('Error updating counts:', error);
+    console.error('Error updating comment count:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
+// PUT endpoint for updating share count
+app.put('/api/recipes/:recipeId/shareCount', verifyToken, async (req, res) => {
+  try {
+    const recipeId = req.params.recipeId;
+    const { shareCount } = req.body;
+
+    const recipeRef = db.collection('recipes').doc(recipeId);
+    const recipeSnapshot = await recipeRef.get();
+
+    if (!recipeSnapshot.exists) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+
+    // Update the shareCount field
+    await recipeRef.update({
+      'count.shareCount': shareCount
+    });
+
+    res.status(200).json({ message: 'Share count updated successfully' });
+  } catch (error) {
+    console.error('Error updating share count:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
