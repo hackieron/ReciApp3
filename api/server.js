@@ -61,6 +61,23 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
 
 // GET endpoint for fetching all recipes
 // GET endpoint for fetching all recipes with user information
+// Add a new endpoint to fetch user's full name
+app.get('/api/user/:userId/fullname', verifyToken, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const userSnapshot = await db.collection('users').doc(userId).get();
+    const userData = userSnapshot.data();
+
+    // Assuming 'fullName' field exists in the 'users' collection
+    const fullName = userData.fullName || '';
+    res.status(200).send(fullName);
+  } catch (error) {
+    console.error('Error fetching user full name:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
+// GET endpoint for fetching all recipes
 app.get('/api/recipes', verifyToken, async (req, res) => {
   try {
     const recipesSnapshot = await db.collection('recipes').get();
@@ -92,7 +109,6 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
-
 
 // Start the server
 app.listen(PORT, () => {

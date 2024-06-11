@@ -85,45 +85,75 @@ class CreateRecipeFragment : Fragment() {
         }
         return values
     }
-
+    // Modify the createRecipe function to include the user's full name
     private fun createRecipe(recipeName: String, ingredients: List<String>, steps: List<String>, token: String) {
         val url = "https://reci-app-testing.vercel.app/api/recipes"
         val client = OkHttpClient()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userId = currentUser?.uid ?: ""
 
-        val json = JSONObject().apply {
-            put("recipeName", recipeName)
-            put("ingredients", JSONArray(ingredients))
-            put("steps", JSONArray(steps))
-        }
-
-        val body = RequestBody.create("application/json".toMediaTypeOrNull(), json.toString())
-        val request = Request.Builder()
-            .url(url)
-            .header("Authorization", token)
-            .post(body)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Failed to create recipe", e)
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Failed to create recipe", Toast.LENGTH_SHORT).show()
-                }
+        // Fetch the user's full name from the server
+        fetchUserFullName(userId) { fullName ->
+            val json = JSONObject().apply {
+                put("recipeName", recipeName)
+                put("ingredients", JSONArray(ingredients))
+                put("steps", JSONArray(steps))
+                put("fullName", fullName)
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    Log.i(TAG, "Recipe created successfully")
-                    requireActivity().runOnUiThread {
-                        Toast.makeText(requireContext(), "Recipe created successfully", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Log.e(TAG, "Failed to create recipe: ${response.code}")
+            val body = RequestBody.create("application/json".toMediaTypeOrNull(), json.toString())
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", token)
+                .post(body)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e(TAG, "Failed to create recipe", e)
                     requireActivity().runOnUiThread {
                         Toast.makeText(requireContext(), "Failed to create recipe", Toast.LENGTH_SHORT).show()
                     }
                 }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        Log.i(TAG, "Recipe created successfully")
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(requireContext(), "Recipe created successfully", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Log.e(TAG, "Failed to create recipe: ${response.code}")
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(requireContext(), "Failed to create recipe", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    // Function to fetch user's full name from the server
+    private fun fetchUserFullName(userId: String, callback: (String) -> Unit) {
+        val url = "https://reci-app-testing.vercel.app/api/user/${userId}/fullname" // Modify endpoint to fetch full name
+        val client = OkHttpClient()
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Failed to fetch user full name", e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val fullName = response.body?.string() ?: ""
+                callback(fullName)
             }
         })
     }
+
+
 }
