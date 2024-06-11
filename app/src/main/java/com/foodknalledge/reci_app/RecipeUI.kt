@@ -26,7 +26,7 @@ class RecipeUI : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.fragment_recipe_create, R.id.navigation_dashboard, R.id.navigation_notifications
+                R.id.fragment_recipe_create, R.id.fragment_recipe_list, R.id.navigation_notifications
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

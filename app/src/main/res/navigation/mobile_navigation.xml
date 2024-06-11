@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_create_recipe" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.foodknalledge.reci_app.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/fragment_recipe_list"
+        android:name="com.foodknalledge.reci_app.RecipeListFragment"
+        android:label="@string/recipes"
+        tools:layout="@layout/fragment_recipe_list" />
 
     <fragment
         android:id="@+id/navigation_notifications"

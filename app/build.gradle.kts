@@ -59,6 +59,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation (libs.okhttp)
+    implementation (libs.androidx.recyclerview)
+    implementation (libs.androidx.cardview)
 
 
 }
