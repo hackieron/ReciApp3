@@ -30,4 +30,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Steps" />
+
+    <!-- Checkboxes for like, comment, and share -->
+    <CheckBox
+        android:id="@+id/likeCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Like" />
+
+    <CheckBox
+        android:id="@+id/commentCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comment" />
+
+    <CheckBox
+        android:id="@+id/shareCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share" />
+
 </LinearLayout>
