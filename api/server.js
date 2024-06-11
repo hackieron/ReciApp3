@@ -59,6 +59,22 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
   }
 });
 
+// GET endpoint for fetching all recipes
+app.get('/api/recipes', verifyToken, async (req, res) => {
+  try {
+    const recipesSnapshot = await db.collection('recipes').get();
+    const recipes = recipesSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

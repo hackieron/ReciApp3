@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "173886468225",
+    "project_id": "reciapp-5cea0",
+    "storage_bucket": "reciapp-5cea0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173886468225:android:0282a17f6d68ec16ccdd80",
+        "android_client_info": {
+          "package_name": "com.foodknalledge.reci_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173886468225-o836bq3se7gvhj9thm0grlj4t0q23snu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQCkckIILNxIdbyC5ak0-28amW34GMMWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "173886468225-o836bq3se7gvhj9thm0grlj4t0q23snu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173886468225:android:8226daa98e77ffcfccdd80",
+        "android_client_info": {
+          "package_name": "com.foodknalledge.reciapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173886468225-o836bq3se7gvhj9thm0grlj4t0q23snu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQCkckIILNxIdbyC5ak0-28amW34GMMWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "173886468225-o836bq3se7gvhj9thm0grlj4t0q23snu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
