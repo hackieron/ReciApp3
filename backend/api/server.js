@@ -38,7 +38,7 @@ const verifyToken = async (req, res, next) => {
 };
 
 // POST endpoint for creating a new recipe
-app.post('/api/recipes', verifyToken, async (req, res) => {
+app.post('/backend/api/recipes', verifyToken, async (req, res) => {
   try {
     const { recipeName, ingredients, steps } = req.body;
     const userId = req.uid;
