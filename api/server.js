@@ -80,7 +80,7 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
         recipeName: recipeData.recipeName,
         ingredients: recipeData.ingredients,
         steps: recipeData.steps,
-        userName: userData.username, // Assuming 'username' field exists in the 'users' collection
+        userName: userData.fullName, // Assuming 'username' field exists in the 'users' collection
       };
 
       recipes.push(recipeWithUser);

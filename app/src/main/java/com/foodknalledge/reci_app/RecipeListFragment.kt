@@ -69,12 +69,13 @@ class RecipeListFragment : Fragment() {
                             val recipes = JSONArray(responseData)
                             val recipeList = mutableListOf<Recipe>()
                             for (i in 0 until recipes.length()) {
+                                var name = recipes.getJSONObject(i).getString("fullName")
                                 val recipe = recipes.getJSONObject(i)
                                 val recipeName = recipe.getString("recipeName")
                                 val ingredients = jsonArrayToList(recipe.getJSONArray("ingredients"))
                                 val steps = jsonArrayToList(recipe.getJSONArray("steps"))
 
-                                recipeList.add(Recipe(recipeName, ingredients, steps))
+                                recipeList.add(Recipe(recipeName, ingredients, steps, name))
                             }
                             recipeRecyclerView.adapter = RecipeAdapter(recipeList)
                         } catch (e: Exception) {
@@ -99,8 +100,8 @@ class RecipeListFragment : Fragment() {
         }
         return list
     }
+    data class Recipe(val name: String, val ingredients: List<String>, val steps: List<String>, val fullName: String)
 
-    data class Recipe(val name: String, val ingredients: List<String>, val steps: List<String>)
 
     class RecipeAdapter(private val recipeList: List<Recipe>) :
         RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
