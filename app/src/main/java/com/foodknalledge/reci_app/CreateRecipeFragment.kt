@@ -85,7 +85,8 @@ class CreateRecipeFragment : Fragment() {
         }
         return values
     }
-    // Modify the createRecipe function to include the user's full name
+
+    // Modify the createRecipe function to include the user's full name and counts
     private fun createRecipe(recipeName: String, ingredients: List<String>, steps: List<String>, token: String) {
         val url = "https://reci-app-testing.vercel.app/api/recipes"
         val client = OkHttpClient()
@@ -99,6 +100,11 @@ class CreateRecipeFragment : Fragment() {
                 put("ingredients", JSONArray(ingredients))
                 put("steps", JSONArray(steps))
                 put("fullName", fullName)
+                put("count", JSONArray().put(JSONObject().apply {
+                    put("likeCount", 0)
+                    put("commentCount", 0)
+                    put("shareCount", 0)
+                }))
             }
 
             val body = RequestBody.create("application/json".toMediaTypeOrNull(), json.toString())
@@ -122,8 +128,6 @@ class CreateRecipeFragment : Fragment() {
                         requireActivity().runOnUiThread {
                             Toast.makeText(requireContext(), "Recipe created successfully", Toast.LENGTH_SHORT).show()
                         }
-                        // Send a POST request to update counts for the recipe
-                        updateRecipeCounts(recipeName)
                     } else {
                         Log.e(TAG, "Failed to create recipe: ${response.code}")
                         requireActivity().runOnUiThread {
@@ -134,40 +138,6 @@ class CreateRecipeFragment : Fragment() {
             })
         }
     }
-
-    // Function to send a POST request to update counts for the recipe
-    private fun updateRecipeCounts(recipeName: String) {
-        val url = "https://reci-app-testing.vercel.app/api/recipes/$recipeName/count"
-        val client = OkHttpClient()
-
-        val json = JSONObject().apply {
-            // You can include any counts you want to update here
-            put("likesCount", 0)
-            put("commentsCount", 0)
-            put("sharesCount", 0)
-        }
-
-        val body = RequestBody.create("application/json".toMediaTypeOrNull(), json.toString())
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "Failed to update counts for the recipe", e)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    Log.i(TAG, "Counts updated successfully")
-                } else {
-                    Log.e(TAG, "Failed to update counts for the recipe: ${response.code}")
-                }
-            }
-        })
-    }
-
 
     // Function to fetch user's full name from the server
     private fun fetchUserFullName(userId: String, callback: (String) -> Unit) {
@@ -191,7 +161,4 @@ class CreateRecipeFragment : Fragment() {
             }
         })
     }
-
-
-
 }
