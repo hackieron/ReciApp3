@@ -1,10 +1,14 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const app = express();
+const multer = require('multer');
 const PORT = process.env.PORT || 3000;
 
+const path = require('path');
+const serviceAccountPath = path.resolve(__dirname, 'serviceAccountKey.json');
+
 // Initialize Firebase Admin SDK
-const serviceAccount = require('/backend/keys/serviceAccountKey.json');
+const serviceAccount = require(serviceAccountPath);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://console.firebase.google.com/u/0/project/reciapp-5cea0/firestore/databases/-default-/data/~2F'
