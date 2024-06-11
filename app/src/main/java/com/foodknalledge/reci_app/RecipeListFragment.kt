@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -69,6 +70,7 @@ class RecipeListFragment : Fragment() {
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     val responseData = response.body?.string()
+                    Log.i(TAG, "Recipes data: $responseData")
                     requireActivity().runOnUiThread {
                         try {
                             val recipes = JSONArray(responseData)
@@ -80,8 +82,12 @@ class RecipeListFragment : Fragment() {
                                 val steps = jsonArrayToList(recipe.getJSONArray("steps"))
                                 val fullName = recipe.getString("fullName")
                                 val recipeId = recipe.getString("recipeId")
-
-                                recipeList.add(Recipe(recipeId, recipeName, ingredients, steps, fullName))
+                                // Access count object
+                                val countObject = recipe.getJSONObject("count")
+                                val likeCount = countObject.getInt("likeCount")
+                                val commentCount = countObject.getInt("commentCount")
+                                val shareCount = countObject.getInt("shareCount")
+                                recipeList.add(Recipe(recipeId, recipeName, ingredients, steps, fullName, likeCount, commentCount, shareCount))
                             }
                             recipeRecyclerView.adapter = RecipeAdapter(recipeList, token)
                         } catch (e: Exception) {
@@ -113,7 +119,10 @@ class RecipeListFragment : Fragment() {
         val name: String,
         val ingredients: List<String>,
         val steps: List<String>,
-        val fullName: String
+        val fullName: String,
+        val likeCount: Int = 0,
+        val commentCount: Int = 0,
+        val shareCount: Int = 0
     )
 
     class RecipeAdapter(
@@ -129,6 +138,9 @@ class RecipeListFragment : Fragment() {
             val likeButton: Button = itemView.findViewById(R.id.likeButton)
             val shareButton: Button = itemView.findViewById(R.id.shareButton)
             val commentButton: Button = itemView.findViewById(R.id.commentButton)
+            val likeCountTextView: TextView = itemView.findViewById(R.id.likeCountTextView)
+            val commentCountTextView: TextView = itemView.findViewById(R.id.commentCountTextView)
+            val shareCountTextView: TextView = itemView.findViewById(R.id.shareCountTextView)
 
         }
 
@@ -137,14 +149,16 @@ class RecipeListFragment : Fragment() {
                 .inflate(R.layout.recipe_item, parent, false)
             return RecipeViewHolder(itemView)
         }
-
+        val db = FirebaseFirestore.getInstance()
         override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
             val recipe = recipeList[position]
             holder.recipeNameTextView.text = recipe.name
             holder.fullNameTextView.text = recipe.fullName
             holder.ingredientsTextView.text = recipe.ingredients.joinToString(", ")
             holder.stepsTextView.text = recipe.steps.joinToString(", ")
-
+            holder.likeCountTextView.text = "Likes: ${recipe.likeCount}"
+            holder.commentCountTextView.text = "Comments: ${recipe.commentCount}"
+            holder.shareCountTextView.text = "Shares: ${recipe.shareCount}"
             holder.likeButton.setOnClickListener {
                 updateCount(recipe, "likeCount", 1, token) // Increment like count by 1
             }
@@ -155,7 +169,29 @@ class RecipeListFragment : Fragment() {
                 updateCount(recipe, "shareCount", 1, token) // Increment like count by 1
             }
 
+            db.collection("recipes").document(recipe.id)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed", e)
+                        return@addSnapshotListener
+                    }
 
+                    if (snapshot != null && snapshot.exists()) {
+                        // Update like count
+                        val likeCount = snapshot.getLong("count.likeCount") ?: 0
+                        holder.likeCountTextView.text = "Likes: $likeCount"
+
+                        // Update comment count
+                        val commentCount = snapshot.getLong("count.commentCount") ?: 0
+                        holder.commentCountTextView.text = "Comments: $commentCount"
+
+                        // Update share count
+                        val shareCount = snapshot.getLong("count.shareCount") ?: 0
+                        holder.shareCountTextView.text = "Shares: $shareCount"
+                    } else {
+                        Log.d(TAG, "Current data: null")
+                    }
+                }
 
         }
 
