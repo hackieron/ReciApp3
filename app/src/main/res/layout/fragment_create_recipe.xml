@@ -59,12 +59,37 @@
                 android:layout_height="wrap_content"
                 android:text="Add Step" />
         </LinearLayout>
+        <Button
+            android:id="@+id/attachFilesButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Attach Files" />
+        <GridLayout
+            android:id="@+id/collageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:columnCount="2"
+            android:orientation="horizontal" />
 
+        <!-- Preview section for files -->
+        <LinearLayout
+            android:id="@+id/filePreviewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:visibility="gone">
+
+            <!-- This layout will be populated with previews of selected files -->
+        </LinearLayout>
         <Button
             android:id="@+id/createButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Create Recipe" />
+
+
     </LinearLayout>
 </ScrollView>

@@ -64,7 +64,6 @@ dependencies {
     implementation (libs.androidx.recyclerview)
     implementation (libs.androidx.cardview)
     implementation (libs.firebase.storage)
-    implementation (libs.imagepicker)
-    implementation("androidx.activity:activity-ktx:1.9.0")
+
 
 }

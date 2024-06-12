@@ -132,7 +132,8 @@ app.get('/api/recipes', verifyToken, async (req, res) => {
         recipeName: recipeData.recipeName,
         ingredients: recipeData.ingredients,
         steps: recipeData.steps,
-        fullName: recipeData.fullName, // Check if userData exists
+        fullName: recipeData.fullName,
+        files: recipeData.files,// Check if userData exists
         count: recipeData.count // Include count field
       };
 
