@@ -202,6 +202,54 @@ app.put('/api/recipes/:recipeId/shareCount', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+//POST COMMENTS
+// POST endpoint for adding a comment to a recipe
+app.post('/api/recipes/:recipeId/comments', verifyToken, async (req, res) => {
+  try {
+    const recipeId = req.params.recipeId;
+    const { commentText } = req.body;
+    const userId = req.uid;
+
+    // Create new comment document
+    const commentRef = await db.collection('comments').add({
+      recipeId,
+      userId,
+      commentText,
+      timestamp: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    res.status(201).json({
+      commentId: commentRef.id,
+      recipeId,
+      userId,
+      commentText,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
+// GET endpoint for fetching comments for a specific recipe
+app.get('/api/recipes/:recipeId/comments', verifyToken, async (req, res) => {
+  try {
+    const recipeId = req.params.recipeId;
+    const commentsSnapshot = await db.collection('comments')
+      .where('recipeId', '==', recipeId)
+      .orderBy('timestamp', 'desc')
+      .get();
+
+    const comments = commentsSnapshot.docs.map(doc => ({
+      commentId: doc.id,
+      ...doc.data()
+    }));
+
+    res.status(200).json(comments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
 
 
 // Start the server
