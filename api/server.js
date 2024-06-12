@@ -14,6 +14,26 @@ admin.initializeApp({
   databaseURL: 'https://console.firebase.google.com/u/0/project/reciapp-5cea0/firestore/databases/-default-/data/~2F'
 });
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/') // Set your desired upload directory
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname) // Keep the original filename
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  // Accept only image and video files
+  if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image and video files are allowed!'), false);
+  }
+};
+
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
 // Firestore instance
 const db = admin.firestore();
 
@@ -39,19 +59,23 @@ const verifyToken = async (req, res, next) => {
 
 // POST endpoint for creating a new recipe
 // POST endpoint for creating a new recipe
-app.post('/api/recipes', verifyToken, async (req, res) => {
+app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res) => {
   try {
     const { recipeName, ingredients, steps, fullName } = req.body;
     const userId = req.uid;
 
-    // Create new recipe document
+    // Extract filenames from uploaded files
+    const fileNames = req.files.map(file => file.filename);
+
+    // Create new recipe document with file names
     const recipeRef = await db.collection('recipes').add({
-      userId, // Add userId to the recipe document
+      userId,
       recipeName,
       ingredients,
       steps,
       fullName,
-      count: { // Set initial count values to 0
+      files: fileNames, // Save filenames in a new field
+      count: {
         likeCount: 0,
         commentCount: 0,
         shareCount: 0
@@ -65,7 +89,8 @@ app.post('/api/recipes', verifyToken, async (req, res) => {
       ingredients,
       steps,
       fullName,
-      count: { // Return the count object with initial values
+      files: fileNames, // Return filenames in the response
+      count: {
         likeCount: 0,
         commentCount: 0,
         shareCount: 0
