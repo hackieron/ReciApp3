@@ -76,14 +76,16 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
     const uploadedFiles = await Promise.all(fileUploadPromises);
 
     // Get download URLs of uploaded files
-
+    // Get download URLs of uploaded files
+    const downloadUrls = uploadedFiles.map(file => file.metadata.mediaLink);
+    // Create new recipe document with file URLs
     const recipeRef = await db.collection('recipes').add({
       userId,
       recipeName,
       ingredients,
       steps,
       fullName,
-      files, // Save download URLs in a new field
+      files: downloadUrls, // Save download URLs in a new field
       count: {
         likeCount: 0,
         commentCount: 0,
@@ -98,7 +100,7 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
       ingredients,
       steps,
       fullName,
-      files, // Return download URLs in the response
+      files: downloadUrls, // Return download URLs in the response
       count: {
         likeCount: 0,
         commentCount: 0,
