@@ -53,7 +53,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.firebase.auth.ktx)
     implementation (libs.firebase.auth)
-    implementation(libs.firebase.firestore.ktx) // Or the latest version
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.play.services.cast.framework) // Or the latest version
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,6 +63,8 @@ dependencies {
     implementation (libs.okhttp)
     implementation (libs.androidx.recyclerview)
     implementation (libs.androidx.cardview)
-
+    implementation (libs.firebase.storage)
+    implementation (libs.imagepicker)
+    implementation("androidx.activity:activity-ktx:1.9.0")
 
 }

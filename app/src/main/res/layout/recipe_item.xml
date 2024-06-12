@@ -6,83 +6,102 @@
     android:padding="16dp"
     android:radius="8dp"
     android:layout_margin="9dp"
-    android:elevation="5dp"
-    >
-<LinearLayout
-    android:padding="16dp"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-
-    <TextView
-        android:id="@+id/recipeNameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:paddingBottom="4dp" />
-
-    <TextView
-        android:id="@+id/fullNameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Full Name" />
-
-    <TextView
-        android:id="@+id/ingredientsTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ingredients" />
-
-    <TextView
-        android:id="@+id/stepsTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Steps" />
+    android:elevation="5dp">
 
     <LinearLayout
+        android:padding="16dp"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="8dp">
+        android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/likeButton"
+        <TextView
+            android:id="@+id/recipeNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/fullNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Full Name" />
+
+        <TextView
+            android:id="@+id/ingredientsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingredients" />
+
+        <TextView
+            android:id="@+id/stepsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Steps" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <Button
+                android:id="@+id/likeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Like" />
+
+            <Button
+                android:id="@+id/shareButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/likeCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Like" />
+            android:text="Likes: " />
 
-        <Button
-            android:id="@+id/commentButton"
+        <TextView
+            android:id="@+id/commentCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Comment" />
+            android:text="Comments: " />
 
-        <Button
-            android:id="@+id/shareButton"
+        <TextView
+            android:id="@+id/shareCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Share" />
+            android:text="Shares: " />
+
+        <!-- Comment Input Layout and Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/commentEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Write a comment" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/commentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comment" />
+        </LinearLayout>
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/likeCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Likes: " />
-
-    <TextView
-        android:id="@+id/commentCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Comments: " />
-
-    <TextView
-        android:id="@+id/shareCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Shares: " />
-
-</LinearLayout>
-    </androidx.cardview.widget.CardView>
+</androidx.cardview.widget.CardView>

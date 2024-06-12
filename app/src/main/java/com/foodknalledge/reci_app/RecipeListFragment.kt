@@ -2,6 +2,7 @@ package com.foodknalledge.reci_app
 
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -141,7 +142,7 @@ class RecipeListFragment : Fragment() {
             val likeCountTextView: TextView = itemView.findViewById(R.id.likeCountTextView)
             val commentCountTextView: TextView = itemView.findViewById(R.id.commentCountTextView)
             val shareCountTextView: TextView = itemView.findViewById(R.id.shareCountTextView)
-
+            val commentEditText: TextView = itemView.findViewById(R.id.commentEditText)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -163,12 +164,34 @@ class RecipeListFragment : Fragment() {
                 updateCount(recipe, "likeCount", 1, token) // Increment like count by 1
             }
             holder.commentButton.setOnClickListener {
-                updateCount(recipe, "commentCount", 1, token) // Increment like count by 1
+                val commentText = holder.commentEditText.text.toString()
+                if (commentText.isNotEmpty()) {
+                    addComment(recipe.id, commentText, token)
+                    Log.i(TAG, "Comment added successfully")
+                    updateCount(recipe, "commentCount", 1, token)
+
+                } else {
+                    Toast.makeText(
+                        holder.itemView.context,
+                        "Comment cannot be empty",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             holder.shareButton.setOnClickListener {
                 updateCount(recipe, "shareCount", 1, token) // Increment like count by 1
             }
-
+            holder.itemView.setOnClickListener {
+                // Open RecipeView activity when the CardView is clicked
+                val intent = Intent(holder.itemView.context, RecipeView::class.java).apply {
+                    putExtra("recipeId", recipe.id)
+                    putExtra("fullName", recipe.fullName)
+                    putExtra("recipeName", recipe.name)
+                    putStringArrayListExtra("ingredients", ArrayList(recipe.ingredients))
+                    putStringArrayListExtra("steps", ArrayList(recipe.steps))
+                }
+                holder.itemView.context.startActivity(intent)
+            }
             db.collection("recipes").document(recipe.id)
                 .addSnapshotListener { snapshot, e ->
                     if (e != null) {
@@ -247,7 +270,34 @@ class RecipeListFragment : Fragment() {
 
 
 
+        private fun addComment(recipeId: String, commentText: String, token: String) {
+            val url = "https://reci-app-testing.vercel.app/api/recipes/$recipeId/comments"
+            val client = OkHttpClient()
+            val requestBody = JSONObject().apply {
+                put("commentText", commentText)
+            }.toString().toRequestBody("application/json".toMediaTypeOrNull())
 
+            val request = Request.Builder()
+                .url(url)
+                .header("Authorization", token)
+                .post(requestBody)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e(TAG, "Failed to add comment", e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        Log.i(TAG, "Comment added successfully")
+                        // Update UI or fetch comments again
+                    } else {
+                        Log.e(TAG, "Failed to add comment: ${response.code}")
+                    }
+                }
+            })
+        }
     }
 
 }

@@ -17,6 +17,7 @@ class RecipeUI : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityRecipeUiBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
