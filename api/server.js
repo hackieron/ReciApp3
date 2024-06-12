@@ -14,14 +14,7 @@ admin.initializeApp({
   databaseURL: 'https://console.firebase.google.com/u/0/project/reciapp-5cea0/firestore/databases/-default-/data/~2F'
 });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/') // Set your desired upload directory
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname) // Keep the original filename
-  }
-});
+const storage = multer.memoryStorage(); // Use memory storage for Firebase
 
 const fileFilter = (req, file, cb) => {
   // Accept only image and video files
@@ -31,6 +24,8 @@ const fileFilter = (req, file, cb) => {
     cb(new Error('Only image and video files are allowed!'), false);
   }
 };
+
+
 
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
@@ -59,22 +54,39 @@ const verifyToken = async (req, res, next) => {
 
 // POST endpoint for creating a new recipe
 // POST endpoint for creating a new recipe
+// POST endpoint for creating a new recipe
 app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res) => {
   try {
     const { recipeName, ingredients, steps, fullName } = req.body;
     const userId = req.uid;
 
-    // Extract filenames from uploaded files
-    const fileNames = req.files.map(file => file.filename);
+    // Upload files to Firebase Storage
+    const fileUploadPromises = req.files.map(file => {
+      const fileRef = admin.storage().bucket().file(`files/${recipeName}_${file.originalname}`);
+      const options = {
+        gzip: true,
+        metadata: {
+          contentType: file.mimetype
+        }
+      };
 
-    // Create new recipe document with file names
+      return fileRef.save(file.buffer, options);
+    });
+
+    await Promise.all(fileUploadPromises);
+
+    // Get download URLs of uploaded files
+    const downloadUrl = `https://storage.googleapis.com/reciapp-5cea0.appspot.com/${file.metadata.name}`;
+
+
+    // Create new recipe document with file URLs
     const recipeRef = await db.collection('recipes').add({
       userId,
       recipeName,
       ingredients,
       steps,
       fullName,
-      files: fileNames, // Save filenames in a new field
+      files: downloadUrls, // Save download URLs in a new field
       count: {
         likeCount: 0,
         commentCount: 0,
@@ -89,7 +101,7 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
       ingredients,
       steps,
       fullName,
-      files: fileNames, // Return filenames in the response
+      files: downloadUrls, // Return download URLs in the response
       count: {
         likeCount: 0,
         commentCount: 0,
