@@ -53,31 +53,12 @@ const verifyToken = async (req, res, next) => {
 };
 
 
-app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res) => {
+app.post('/api/recipes', verifyToken, async (req, res) => {
   try {
-    const { recipeName, ingredients, steps, fullName } = req.body;
+    const { recipeName, ingredients, steps, fullName, files } = req.body;
     const userId = req.uid;
 
-    const fileUploadPromises = req.files && req.files.length > 0
-      ? req.files.map((file, index) => {
-          const fileRef = admin.storage().bucket().file(`files/${recipeName}_${file.originalname}`);
-          const options = {
-            gzip: true,
-            metadata: {
-              contentType: file.mimetype
-            }
-          };
 
-          return fileRef.save(file.buffer, options);
-        })
-      : [];
-
-    // Wait for all file uploads to complete
-    const uploadedFiles = await Promise.all(fileUploadPromises);
-
-    // Get download URLs of uploaded files
-    // Get download URLs of uploaded files
-    const downloadUrls = uploadedFiles.map(file => file.metadata.mediaLink);
     // Create new recipe document with file URLs
     const recipeRef = await db.collection('recipes').add({
       userId,
@@ -85,7 +66,7 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
       ingredients,
       steps,
       fullName,
-      files: downloadUrls, // Save download URLs in a new field
+      files, // Save download URLs in a new field
       count: {
         likeCount: 0,
         commentCount: 0,
@@ -100,7 +81,7 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
       ingredients,
       steps,
       fullName,
-      files: downloadUrls, // Return download URLs in the response
+      files,// Return download URLs in the response
       count: {
         likeCount: 0,
         commentCount: 0,
@@ -112,6 +93,7 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
 
 
 // GET endpoint for fetching user's full name
