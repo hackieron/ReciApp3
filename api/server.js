@@ -76,7 +76,7 @@ app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res)
     const uploadedFiles = await Promise.all(fileUploadPromises);
 
     // Get download URLs of uploaded files
-    const downloadUrls = uploadedFiles.map(file => file.metadata.mediaLink);
+    const downloadUrls = uploadedFiles.map(file => `https://console.firebase.google.com/u/0/project/reciapp-5cea0/storage/reciapp-5cea0.appspot.com/files/${file.metadata.name}`);
     // Create new recipe document with file URLs
     const recipeRef = await db.collection('recipes').add({
       userId,
