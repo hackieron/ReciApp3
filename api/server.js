@@ -52,32 +52,29 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-// POST endpoint for creating a new recipe
-// POST endpoint for creating a new recipe
-// POST endpoint for creating a new recipe
+
 app.post('/api/recipes', verifyToken, upload.array('files', 5), async (req, res) => {
   try {
     const { recipeName, ingredients, steps, fullName } = req.body;
     const userId = req.uid;
 
     // Upload files to Firebase Storage
-    const fileUploadPromises = req.files.map(file => {
-      const fileRef = admin.storage().bucket().file(`files/${recipeName}_${file.originalname}`);
-      const options = {
-        gzip: true,
-        metadata: {
-          contentType: file.mimetype
-        }
-      };
+   const fileUploadPromises = req.files.map(file => {
+     const fileRef = admin.storage().bucket().file(`files/${recipeName}_${file.originalname}`);
+     const options = {
+       gzip: true,
+       metadata: {
+         contentType: file.mimetype
+       }
+     };
 
-      return fileRef.save(file.buffer, options);
-    });
-
+     return fileRef.save(file.buffer, options);
+   });
+    const uploadedFiles = await Promise.all(fileUploadPromises);
     await Promise.all(fileUploadPromises);
 
     // Get download URLs of uploaded files
-    const downloadUrl = `https://storage.googleapis.com/reciapp-5cea0.appspot.com/${file.metadata.name}`;
-
+   const downloadUrls = uploadedFiles.map(file => `https://storage.googleapis.com/reciapp-5cea0.appspot.com/${file.metadata.name}`);
 
     // Create new recipe document with file URLs
     const recipeRef = await db.collection('recipes').add({
