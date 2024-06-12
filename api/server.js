@@ -204,16 +204,23 @@ app.put('/api/recipes/:recipeId/shareCount', verifyToken, async (req, res) => {
 });
 //POST COMMENTS
 // POST endpoint for adding a comment to a recipe
+// POST endpoint for adding a comment to a recipe
 app.post('/api/recipes/:recipeId/comments', verifyToken, async (req, res) => {
   try {
     const recipeId = req.params.recipeId;
     const { commentText } = req.body;
     const userId = req.uid;
 
+    // Fetch the user's fullName from the users collection
+    const userSnapshot = await db.collection('users').doc(userId).get();
+    const userData = userSnapshot.data();
+    const fullName = userData.fullName || ''; // Assuming fullName is a field in the user document
+
     // Create new comment document
     const commentRef = await db.collection('comments').add({
       recipeId,
       userId,
+      fullName,
       commentText,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -222,6 +229,7 @@ app.post('/api/recipes/:recipeId/comments', verifyToken, async (req, res) => {
       commentId: commentRef.id,
       recipeId,
       userId,
+      fullName,
       commentText,
       timestamp: new Date()
     });
@@ -230,6 +238,7 @@ app.post('/api/recipes/:recipeId/comments', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+
 // GET endpoint for fetching comments for a specific recipe
 app.get('/api/recipes/:recipeId/comments', verifyToken, async (req, res) => {
   try {
